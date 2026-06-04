@@ -22,6 +22,7 @@ docker compose up --build
 
 Then open:
 
+- Console UI: http://localhost:8080/
 - Swagger UI: http://localhost:8080/swagger
 - Health check: http://localhost:8080/health
 
@@ -45,6 +46,17 @@ dotnet test
   PostgreSQL container (Testcontainers), firing HTTP at the actual endpoints. The Treasury API is
   faked so tests are deterministic.
 
+The test projects use **xUnit.net v3**, running through `dotnet test` as usual.
+
+**Contract tests** (`TreasuryApiContractTests`) hit the *live* Treasury API to verify our
+assumptions about its contract. They are marked `[Fact(Explicit = true)]`, so a normal
+`dotnet test` skips them; they run when selected by a filter, and need network access (not
+Docker):
+
+```bash
+dotnet test --filter "FullyQualifiedName~TreasuryApiContractTests"
+```
+
 ## API surface
 
 | Requirement | Method & route                          | Notes                                                 |
@@ -60,7 +72,11 @@ dotnet test
   and conversion is `amount × rate`.
 - **`currency` is the Treasury `country_currency_desc`** (e.g. `Canada-Dollar`, `Euro Zone-Euro`),
   not an ISO code — it matches the dataset exactly and avoids a brittle ISO mapping.
-- **Schema** lives in `AppDbContext`; the skeleton creates it via `EnsureCreated()`. This is
-  replaced by an EF Core migration once the model stabilises. `schema.sql` documents the result.
+- **Schema** is managed by an EF Core migration (`src/Wex.CardApi/Migrations`) applied on
+  startup via `Database.Migrate()`. `schema.sql` is a human-readable reference. If you ran an
+  earlier build that used `EnsureCreated()`, reset the dev database first so the migration can
+  apply cleanly: `docker compose down -v`.
+- **EF tooling (optional):** `dotnet tool install --global dotnet-ef`, then e.g.
+  `dotnet ef migrations add <Name> -p src/Wex.CardApi` or `dotnet ef migrations script -p src/Wex.CardApi`.
 - **NuGet versions** are pinned to .NET 10-era releases; `dotnet restore` will flag any that need a
   minor bump in your environment.

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WEX Card API · Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1115;
+      --rail: #0b0d10;
+      --surface: #161922;
+      --surface-2: #1c212c;
+      --border: #2a303c;
+      --text: #e8eaf0;
+      --muted: #8b92a1;
+      --accent: #f2c14e;
+      --accent-ink: #1a1205;
+      --ok: #5fd38a;
+      --err: #ff7a7a;
+      --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Sidebar ---- */
+    .rail {
+      width: 256px;
+      flex-shrink: 0;
+      background: var(--rail);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 22px 14px;
+    }
+    .brand { padding: 6px 10px 22px; }
+    .brand h1 {
+      font-size: 15px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin: 0;
+      font-weight: 700;
+    }
+    .brand span { color: var(--accent); }
+    .brand p {
+      margin: 4px 0 0;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .04em;
+    }
+    nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav-btn {
+      text-align: left;
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 11px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      border-left: 2px solid transparent;
+      transition: background .14s ease, color .14s ease, border-color .14s ease;
+    }
+    .nav-btn .idx { font-family: var(--mono); font-size: 11px; opacity: .6; }
+    .nav-btn:hover { background: var(--surface); color: var(--text); }
+    .nav-btn.active {
+      background: var(--surface-2);
+      color: var(--text);
+      border-left-color: var(--accent);
+    }
+    .rail-foot {
+      margin-top: auto;
+      padding: 12px 10px 2px;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.9;
+      word-break: break-all;
+    }
+    .rail-foot b { color: var(--text); font-weight: 500; }
+
+    /* ---- Main ---- */
+    main { flex: 1; overflow-y: auto; padding: 40px 48px; }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    .view { display: none; }
+    .view.visible { display: block; animation: fade .22s ease; }
+    @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .view-head { margin-bottom: 26px; }
+    .route {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 5px 10px; border-radius: 6px; color: var(--muted);
+    }
+    .route .m { color: var(--accent); font-weight: 600; }
+    .view-head h2 { font-size: 24px; margin: 14px 0 4px; font-weight: 600; }
+    .view-head p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .field { margin-bottom: 16px; }
+    label {
+      display: block; font-size: 12px; color: var(--muted);
+      margin-bottom: 6px; letter-spacing: .03em; text-transform: uppercase;
+    }
+    input {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: var(--mono); font-size: 14px;
+      padding: 11px 12px; border-radius: 8px; outline: none;
+      transition: border-color .14s ease, box-shadow .14s ease;
+    }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(242,193,78,.14); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    button.go {
+      margin-top: 6px; background: var(--accent); color: var(--accent-ink);
+      border: 0; font-family: var(--sans); font-weight: 600; font-size: 14px;
+      padding: 11px 20px; border-radius: 8px; cursor: pointer;
+      transition: transform .1s ease, filter .14s ease;
+    }
+    button.go:hover { filter: brightness(1.06); }
+    button.go:active { transform: translateY(1px); }
+
+    .result { margin-top: 26px; }
+    .result-empty {
+      border: 1px dashed var(--border); border-radius: 10px;
+      padding: 20px; color: var(--muted); font-family: var(--mono);
+      font-size: 13px; text-align: center;
+    }
+    .result.flash pre { animation: fade .22s ease; }
+    .status {
+      font-family: var(--mono); font-size: 13px; font-weight: 600;
+      padding: 7px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--border);
+      border-bottom: 0;
+    }
+    .status.ok { color: var(--ok); background: rgba(95,211,138,.08); }
+    .status.err { color: var(--err); background: rgba(255,122,122,.08); }
+    pre {
+      margin: 0; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 0 0 10px 10px; padding: 16px; overflow-x: auto;
+      font-family: var(--mono); font-size: 13px; line-height: 1.55; color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <aside class="rail">
+    <div class="brand">
+      <h1>WEX <span>·</span> CARD API</h1>
+      <p>console</p>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-view="create"><span class="idx">01</span> Create card</button>
+      <button class="nav-btn" data-view="transaction"><span class="idx">02</span> Add transaction</button>
+      <button class="nav-btn" data-view="convert"><span class="idx">03</span> Convert transaction</button>
+      <button class="nav-btn" data-view="balance"><span class="idx">04</span> Card balance</button>
+    </nav>
+    <div class="rail-foot">
+      card&nbsp;&nbsp;<b id="sess-card">—</b><br />
+      txn&nbsp;&nbsp;&nbsp;<b id="sess-txn">—</b>
+    </div>
+  </aside>
+
+  <main>
+    <div class="wrap">
+
+      <!-- 01 Create card -->
+      <section class="view visible" id="view-create">
+        <div class="view-head">
+          <span class="route"><span class="m">POST</span> /cards</span>
+          <h2>Create card</h2>
+          <p>Store a card with a credit limit (USD). Returns a generated id.</p>
+        </div>
+        <div class="field">
+          <label for="card-limit">Credit limit</label>
+          <input id="card-limit" type="number" step="0.01" value="1000" />
+        </div>
+        <button class="go" onclick="createCard()">Create card</button>
+        <div class="result result-empty" id="res-create">No response yet.</div>
+      </section>
+
+      <!-- 02 Add transaction -->
+      <section class="view" id="view-transaction">
+        <div class="view-head">
+          <span class="route"><span class="m">POST</span> /cards/{cardId}/transactions</span>
+          <h2>Add transaction</h2>
+          <p>Store a purchase transaction (amount in USD) against a card.</p>
+        </div>
+        <div class="field">
+          <label for="txn-cardId">Card id</label>
+          <input id="txn-cardId" type="text" placeholder="GUID from Create card" />
+        </div>
+        <div class="field">
+          <label for="txn-desc">Description</label>
+          <input id="txn-desc" type="text" value="Coffee" />
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="txn-date">Transaction date</label>
+            <input id="txn-date" type="date" />
+          </div>
+          <div class="field">
+            <label for="txn-amount">Amount</label>
+            <input id="txn-amount" type="number" step="0.01" value="12.50" />
+          </div>
+        </div>
+        <button class="go" onclick="addTxn()">Add transaction</button>
+        <div class="result result-empty" id="res-txn">No response yet.</div>
+      </section>
+
+      <!-- 03 Convert transaction -->
+      <section class="view" id="view-convert">
+        <div class="view-head">
+          <span class="route"><span class="m">GET</span> /transactions/{id}?currency=</span>
+          <h2>Convert transaction</h2>
+          <p>Retrieve a transaction converted using the rate on/before its date (within 6 months).</p>
+        </div>
+        <div class="field">
+          <label for="conv-txnId">Transaction id</label>
+          <input id="conv-txnId" type="text" placeholder="GUID from Add transaction" />
+        </div>
+        <div class="field">
+          <label for="conv-currency">Currency (Treasury country_currency_desc)</label>
+          <input id="conv-currency" type="text" list="currencies" value="Canada-Dollar" />
+        </div>
+        <button class="go" onclick="convert()">Convert</button>
+        <div class="result result-empty" id="res-conv">No response yet.</div>
+      </section>
+
+      <!-- 04 Card balance -->
+      <section class="view" id="view-balance">
+        <div class="view-head">
+          <span class="route"><span class="m">GET</span> /cards/{cardId}/balance?currency=</span>
+          <h2>Card balance</h2>
+          <p>Available balance (limit − transactions) converted at the latest rate.</p>
+        </div>
+        <div class="field">
+          <label for="bal-cardId">Card id</label>
+          <input id="bal-cardId" type="text" placeholder="GUID from Create card" />
+        </div>
+        <div class="field">
+          <label for="bal-currency">Currency (Treasury country_currency_desc)</label>
+          <input id="bal-currency" type="text" list="currencies" value="Canada-Dollar" />
+        </div>
+        <button class="go" onclick="balance()">Get balance</button>
+        <div class="result result-empty" id="res-bal">No response yet.</div>
+      </section>
+
+    </div>
+  </main>
+
+  <datalist id="currencies">
+    <option value="Canada-Dollar"></option>
+    <option value="Euro Zone-Euro"></option>
+    <option value="United Kingdom-Pound"></option>
+    <option value="Japan-Yen"></option>
+    <option value="Australia-Dollar"></option>
+    <option value="Mexico-Peso"></option>
+    <option value="Switzerland-Franc"></option>
+    <option value="India-Rupee"></option>
+  </datalist>
+
+  <script>
+    const state = { cardId: null, txnId: null };
+    const byId = (id) => document.getElementById(id);
+
+    // ---- Navigation ----
+    document.querySelectorAll(".nav-btn").forEach((btn) => {
+      btn.addEventListener("click", () => selectView(btn.dataset.view));
+    });
+
+    function selectView(view) {
+      document.querySelectorAll(".nav-btn").forEach((b) =>
+        b.classList.toggle("active", b.dataset.view === view));
+      document.querySelectorAll(".view").forEach((v) =>
+        v.classList.toggle("visible", v.id === "view-" + view));
+
+      // Convenience: carry the last created ids into the relevant forms.
+      if (view === "transaction" && state.cardId && !byId("txn-cardId").value) byId("txn-cardId").value = state.cardId;
+      if (view === "balance" && state.cardId && !byId("bal-cardId").value) byId("bal-cardId").value = state.cardId;
+      if (view === "convert" && state.txnId && !byId("conv-txnId").value) byId("conv-txnId").value = state.txnId;
+    }
+
+    function updateSession() {
+      byId("sess-card").textContent = state.cardId ?? "—";
+      byId("sess-txn").textContent = state.txnId ?? "—";
+    }
+
+    // ---- HTTP helper ----
+    async function call(method, url, bodyObj) {
+      const opts = { method, headers: {} };
+      if (bodyObj !== undefined) {
+        opts.headers["Content-Type"] = "application/json";
+        opts.body = JSON.stringify(bodyObj);
+      }
+      const res = await fetch(url, opts);
+      const text = await res.text();
+      let body;
+      try { body = text ? JSON.parse(text) : ""; } catch { body = text; }
+      return { res, body };
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    }
+
+    function showResult(host, res, body) {
+      const el = byId(host);
+      const cls = res.ok ? "ok" : "err";
+      const label = res.statusText || (res.ok ? "OK" : "Error");
+      const pretty = typeof body === "string" ? body : JSON.stringify(body, null, 2);
+      el.classList.remove("result-empty");
+      el.innerHTML =
+        `<div class="status ${cls}">${res.status} ${label}</div>` +
+        `<pre>${escapeHtml(pretty || "(empty body)")}</pre>`;
+      el.classList.add("flash");
+      setTimeout(() => el.classList.remove("flash"), 250);
+    }
+
+    // ---- Operations ----
+    async function createCard() {
+      const { res, body } = await call("POST", "/cards", { creditLimit: Number(byId("card-limit").value) });
+      if (res.ok && body && body.id) { state.cardId = body.id; updateSession(); }
+      showResult("res-create", res, body);
+    }
+
+    async function addTxn() {
+      const cardId = byId("txn-cardId").value.trim();
+      const payload = {
+        description: byId("txn-desc").value,
+        transactionDate: byId("txn-date").value,
+        amount: Number(byId("txn-amount").value),
+      };
+      const { res, body } = await call("POST", `/cards/${encodeURIComponent(cardId)}/transactions`, payload);
+      if (res.ok && body && body.id) { state.txnId = body.id; updateSession(); }
+      showResult("res-txn", res, body);
+    }
+
+    async function convert() {
+      const id = byId("conv-txnId").value.trim();
+      const cur = byId("conv-currency").value.trim();
+      const { res, body } = await call("GET", `/transactions/${encodeURIComponent(id)}?currency=${encodeURIComponent(cur)}`);
+      showResult("res-conv", res, body);
+    }
+
+    async function balance() {
+      const id = byId("bal-cardId").value.trim();
+      const cur = byId("bal-currency").value.trim();
+      const { res, body } = await call("GET", `/cards/${encodeURIComponent(id)}/balance?currency=${encodeURIComponent(cur)}`);
+      showResult("res-bal", res, body);
+    }
+
+    // Default the date picker to today.
+    byId("txn-date").value = new Date().toISOString().slice(0, 10);
+  </script>
+</body>
+</html>

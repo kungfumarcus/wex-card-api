@@ -17,6 +17,8 @@
     </PackageReference>
     <!-- Swagger / OpenAPI UI -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    <!-- Standard resilience pipeline (Polly) for the Treasury HttpClient -->
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0" />
   </ItemGroup>
 
 </Project>

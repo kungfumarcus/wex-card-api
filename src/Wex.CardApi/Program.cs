@@ -13,14 +13,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Treasury exchange-rate provider: typed HttpClient + in-memory cache.
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<IExchangeRateProvider, TreasuryExchangeRateProvider>(client =>
-{
-    var baseUrl = builder.Configuration["Treasury:BaseUrl"]
-        ?? "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/";
-    client.BaseAddress = new Uri(baseUrl);
-});
-// NOTE: add resilience here when desired:
-//   builder.Services.AddHttpClient<...>().AddStandardResilienceHandler();
-//   (package: Microsoft.Extensions.Http.Resilience)
+    {
+        var baseUrl = builder.Configuration["Treasury:BaseUrl"]
+            ?? "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/";
+        client.BaseAddress = new Uri(baseUrl);
+    })
+    // Retry (with backoff + jitter), total + per-attempt timeouts, circuit breaker.
+    .AddStandardResilienceHandler();
 
 // Application services
 builder.Services.AddScoped<CardService>();
@@ -34,13 +33,17 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-// SKELETON ONLY: materialise the schema from the EF model on startup.
-// Replaced by an EF Core migration once the model stabilises.
+// Apply EF Core migrations on startup so the schema is present and versioned.
+// (For production you may prefer running migrations as a separate deploy step.)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    db.Database.Migrate();
 }
+
+// Serve the static console UI from wwwroot (index.html at "/").
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseSwagger();
 app.UseSwaggerUI();

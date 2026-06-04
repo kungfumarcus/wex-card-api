@@ -22,13 +22,16 @@ public class TreasuryExchangeRateProviderTests
             """{"data":[{"country_currency_desc":"Canada-Dollar","exchange_rate":"1.3650","record_date":"2024-06-30"}]}"""));
         var sut = CreateSut(handler);
 
-        var result = await sut.GetRateOnOrBeforeAsync("Canada-Dollar", new DateOnly(2024, 7, 15));
+        var result = await sut.GetRateOnOrBeforeAsync(
+            "Canada-Dollar", 
+            new DateOnly(2024, 7, 15), 
+            Xunit.TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(1.3650m, result!.Rate);
         Assert.Equal(new DateOnly(2024, 6, 30), result.RecordDate);
 
-        var url = Uri.UnescapeDataString(handler.LastRequest!.RequestUri!.AbsoluteUri);
+        var url = Uri.UnescapeDataString(handler.LastRequest!.RequestUri!.ToString());
         Assert.Contains("country_currency_desc:eq:Canada-Dollar", url);
         Assert.Contains("record_date:lte:2024-07-15", url);     // on or before the purchase date
         Assert.Contains("record_date:gte:2024-01-15", url);     // within the prior 6 months
@@ -42,12 +45,12 @@ public class TreasuryExchangeRateProviderTests
             """{"data":[{"country_currency_desc":"Canada-Dollar","exchange_rate":"1.40","record_date":"2025-12-31"}]}"""));
         var sut = CreateSut(handler);
 
-        var result = await sut.GetLatestRateAsync("Canada-Dollar");
+        var result = await sut.GetLatestRateAsync("Canada-Dollar", Xunit.TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(1.40m, result!.Rate);
 
-        var url = Uri.UnescapeDataString(handler.LastRequest!.RequestUri!.AbsoluteUri);
+        var url = Uri.UnescapeDataString(handler.LastRequest!.RequestUri!.ToString());
         Assert.Contains("country_currency_desc:eq:Canada-Dollar", url);
         Assert.DoesNotContain("record_date:lte", url);
         Assert.DoesNotContain("record_date:gte", url);
@@ -58,7 +61,10 @@ public class TreasuryExchangeRateProviderTests
     {
         var sut = CreateSut(new StubHttpMessageHandler(_ => Json("""{"data":[]}""")));
 
-        var result = await sut.GetRateOnOrBeforeAsync("Nowhere-Coin", new DateOnly(2024, 7, 15));
+        var result = await sut.GetRateOnOrBeforeAsync(
+            "Nowhere-Coin", 
+            new DateOnly(2024, 7, 15), 
+            Xunit.TestContext.Current.CancellationToken);
 
         Assert.Null(result);
     }
@@ -70,9 +76,9 @@ public class TreasuryExchangeRateProviderTests
             """{"data":[{"country_currency_desc":"Euro Zone-Euro","exchange_rate":"0.92","record_date":"2025-12-31"}]}"""));
         var sut = CreateSut(handler);
 
-        await sut.GetLatestRateAsync("Euro Zone-Euro");
+        await sut.GetLatestRateAsync("Euro Zone-Euro", Xunit.TestContext.Current.CancellationToken);
 
-        // Raw URI should percent-encode the space in the filter value.
+        // The escaped (wire) form keeps the percent-encoding; ToString() would decode it.
         Assert.Contains("Euro%20Zone-Euro", handler.LastRequest!.RequestUri!.AbsoluteUri);
     }
 }

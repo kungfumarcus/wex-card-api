@@ -1,9 +1,9 @@
 -- Reference schema (documentation only).
 --
--- At runtime the skeleton builds this schema from the EF Core model in
--- AppDbContext via Database.EnsureCreated(). Once the model stabilises with
--- the currency-conversion features, EnsureCreated() is replaced by a proper
--- EF Core migration, which becomes the single source of truth for the schema.
+-- The InitialCreate EF Core migration (src/Wex.CardApi/Migrations) is the single
+-- source of truth for the schema and is applied on startup via Database.Migrate().
+-- This file is kept only as a human-readable reference; regenerate the canonical
+-- SQL any time with:  dotnet ef migrations script -p src/Wex.CardApi
 --
 -- Identifiers are quoted PascalCase to match EF Core's default naming.
 
