@@ -1,0 +1,10 @@
+**/bin
+**/obj
+.git
+.gitignore
+.idea
+.vs
+.vscode
+**/*.user
+tests
+README.md

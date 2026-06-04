@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Wex.CardApi/Wex.CardApi.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Wex.CardApi.UnitTests/Wex.CardApi.UnitTests.csproj" />
+    <Project Path="tests/Wex.CardApi.IntegrationTests/Wex.CardApi.IntegrationTests.csproj" />
+  </Folder>
+</Solution>
