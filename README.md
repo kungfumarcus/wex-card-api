@@ -3,9 +3,6 @@
 A C# / ASP.NET Core (.NET 10) service for cards, purchase transactions, and currency-converted
 reads backed by the U.S. Treasury Reporting Rates of Exchange API.
 
-> **Status: skeleton.** The schema and the full API surface are in place; the four endpoints are
-> stubbed and return `501 Not Implemented`. Business logic and tests are added in later iterations.
-
 ## Prerequisites
 
 - **.NET 10 SDK** — to build, run, and test locally.
@@ -65,25 +62,20 @@ Docker):
 dotnet test --filter "FullyQualifiedName~TreasuryApiContractTests"
 ```
 
-## API surface
+## API
 
-| Requirement | Method & route                          | Notes                                                 |
-|-------------|-----------------------------------------|-------------------------------------------------------|
-| #1          | `POST /cards`                           | Create a card with a credit limit.                    |
-| #2          | `POST /cards/{cardId}/transactions`     | Store a purchase transaction (USD).                   |
-| #3          | `GET /transactions/{transactionId}?currency=` | Transaction converted to a currency.           |
-| #4          | `GET /cards/{cardId}/balance?currency=` | Available balance converted to a currency.            |
+The first four endpoints satisfy the four requirements; the last three are read-only endpoints
+that support the console UI. Full request/response schemas are in Swagger UI (`/swagger`).
 
-## Additional read endpoints
-
-Beyond the four required endpoints, two read-only endpoints back the console UI (listing,
-not part of the brief):
-
-| Method & route | Notes |
-|---|---|
-| `GET /cards` | List all cards (populates the card chooser). |
-| `GET /transactions?cardId=&page=&pageSize=&currency=` | A card's transactions, newest first, paged (10/page). With `currency`, each row is converted at the rate for its own purchase date. |
-| `GET /currencies` | Currencies available for conversion, sourced live from the Treasury dataset. |
+| Req | Method & route | Notes |
+|-----|----------------|-------|
+| #1  | `POST /cards`                                 | Create a card with a credit limit. |
+| #2  | `POST /cards/{cardId}/transactions`           | Store a purchase transaction (USD). |
+| #3  | `GET /transactions/{transactionId}?currency=` | Transaction converted to a currency, using the rate on or before its purchase date (within the prior 6 months). |
+| #4  | `GET /cards/{cardId}/balance?currency=`       | Available balance (limit − transactions), converted at the latest rate. |
+|     | `GET /cards`                                  | List all cards (populates the card chooser). |
+|     | `GET /transactions?cardId=&page=&pageSize=&currency=` | A card's transactions, newest first, paged (10/page). With `currency`, each row is converted at the rate for its own purchase date. |
+|     | `GET /currencies`                             | Currencies available for conversion, sourced live from the Treasury dataset. |
 
 ## Notes / decisions
 
@@ -95,7 +87,3 @@ not part of the brief):
   startup via `Database.Migrate()`. `schema.sql` is a human-readable reference. If you ran an
   earlier build that used `EnsureCreated()`, reset the dev database first so the migration can
   apply cleanly: `docker compose down -v`.
-- **EF tooling (optional):** `dotnet tool install --global dotnet-ef`, then e.g.
-  `dotnet ef migrations add <Name> -p src/Wex.CardApi` or `dotnet ef migrations script -p src/Wex.CardApi`.
-- **NuGet versions** are pinned to .NET 10-era releases; `dotnet restore` will flag any that need a
-  minor bump in your environment.
