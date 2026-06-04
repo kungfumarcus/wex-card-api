@@ -16,4 +16,10 @@ public interface IExchangeRateProvider
     /// or no rate exists (Requirement #4).
     /// </summary>
     Task<ExchangeRate?> GetLatestRateAsync(string currency, CancellationToken ct = default);
+
+    /// <summary>
+    /// The currencies available for conversion, as reported in the most recent Treasury
+    /// publication (their <c>country_currency_desc</c> values, sorted).
+    /// </summary>
+    Task<IReadOnlyList<string>> GetAvailableCurrenciesAsync(CancellationToken ct = default);
 }

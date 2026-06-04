@@ -52,6 +52,7 @@ app.MapHealthChecks("/health");
 
 app.MapCardEndpoints();
 app.MapTransactionEndpoints();
+app.MapCurrencyEndpoints();
 
 app.Run();
 

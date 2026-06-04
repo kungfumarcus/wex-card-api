@@ -45,6 +45,35 @@ public sealed class TreasuryExchangeRateProvider(HttpClient http, IMemoryCache c
         });
     }
 
+    public async Task<IReadOnlyList<string>> GetAvailableCurrenciesAsync(CancellationToken ct = default)
+    {
+        var result = await cache.GetOrCreateAsync<IReadOnlyList<string>>("currencies", async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(12);
+
+            // The most recent publication date in the dataset...
+            var latest = await http.GetFromJsonAsync<TreasuryResponse>(
+                $"{Path}?fields=record_date&sort=-record_date&page[size]=1", ct);
+            var latestDate = latest?.Data?.FirstOrDefault()?.RecordDate;
+            if (string.IsNullOrEmpty(latestDate))
+                return Array.Empty<string>();
+
+            // ...then every currency reported on that date.
+            var rows = await http.GetFromJsonAsync<TreasuryResponse>(
+                $"{Path}?fields=country_currency_desc,record_date&filter=record_date:eq:{latestDate}" +
+                "&sort=country_currency_desc&page[size]=500", ct);
+
+            return rows?.Data?
+                .Select(r => r.CountryCurrencyDesc)
+                .Where(d => !string.IsNullOrWhiteSpace(d))
+                .Distinct()
+                .OrderBy(d => d, StringComparer.OrdinalIgnoreCase)
+                .ToArray() ?? Array.Empty<string>();
+        });
+
+        return result ?? Array.Empty<string>();
+    }
+
     private async Task<ExchangeRate?> QueryTopAsync(string filter, CancellationToken ct)
     {
         var url =

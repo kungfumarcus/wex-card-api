@@ -24,6 +24,15 @@ public class CardService(AppDbContext db, IExchangeRateProvider rates)
         return new CardResponse(card.Id, card.CreditLimit, card.CreatedAt);
     }
 
+    /// <summary>Lists all cards, newest first (used to populate the card chooser).</summary>
+    public async Task<IReadOnlyList<CardResponse>> ListAsync(CancellationToken ct)
+    {
+        return await db.Cards
+            .OrderByDescending(c => c.CreatedAt)
+            .Select(c => new CardResponse(c.Id, c.CreditLimit, c.CreatedAt))
+            .ToListAsync(ct);
+    }
+
     /// <summary>
     /// Requirement #4: available balance (credit limit minus the sum of transactions),
     /// converted to the target currency using the latest available rate.

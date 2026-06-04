@@ -20,6 +20,14 @@ That's it — no local PostgreSQL install needed.
 docker compose up --build
 ```
 
+Or use the helper scripts, which start the stack, wait for the API to be healthy, and open the
+console UI automatically:
+
+```bash
+./run.ps1                            # Windows (PowerShell); -Compose "podman compose" for Podman
+./run.sh                             # Linux/macOS;          COMPOSE="podman compose" ./run.sh
+```
+
 Then open:
 
 - Console UI: http://localhost:8080/
@@ -65,6 +73,17 @@ dotnet test --filter "FullyQualifiedName~TreasuryApiContractTests"
 | #2          | `POST /cards/{cardId}/transactions`     | Store a purchase transaction (USD).                   |
 | #3          | `GET /transactions/{transactionId}?currency=` | Transaction converted to a currency.           |
 | #4          | `GET /cards/{cardId}/balance?currency=` | Available balance converted to a currency.            |
+
+## Additional read endpoints
+
+Beyond the four required endpoints, two read-only endpoints back the console UI (listing,
+not part of the brief):
+
+| Method & route | Notes |
+|---|---|
+| `GET /cards` | List all cards (populates the card chooser). |
+| `GET /transactions?cardId=&page=&pageSize=&currency=` | A card's transactions, newest first, paged (10/page). With `currency`, each row is converted at the rate for its own purchase date. |
+| `GET /currencies` | Currencies available for conversion, sourced live from the Treasury dataset. |
 
 ## Notes / decisions
 

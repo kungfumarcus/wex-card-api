@@ -55,4 +55,50 @@ public class TransactionService(AppDbContext db, IExchangeRateProvider rates)
             transaction.Id, transaction.Description, transaction.TransactionDate,
             transaction.Amount, currency, rate.Rate, converted));
     }
+
+    /// <summary>
+    /// Lists a card's transactions, newest first, paged. When <paramref name="currency"/> is set,
+    /// each row is converted at the rate for its own purchase date (Requirement #3); a row with no
+    /// rate in the 6-month window keeps its USD amount with null conversion fields rather than
+    /// failing the whole page.
+    /// </summary>
+    public async Task<ServiceResult<PagedResult<TransactionListItem>>> ListAsync(
+        Guid cardId, int page, int pageSize, string? currency, CancellationToken ct)
+    {
+        var cardExists = await db.Cards.AnyAsync(c => c.Id == cardId, ct);
+        if (!cardExists)
+            return ServiceResult<PagedResult<TransactionListItem>>.Fail(ServiceError.NotFound);
+
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var query = db.Transactions.Where(t => t.CardId == cardId);
+        var total = await query.CountAsync(ct);
+
+        var rows = await query
+            .OrderByDescending(t => t.TransactionDate)
+            .ThenByDescending(t => t.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        var items = new List<TransactionListItem>(rows.Count);
+        foreach (var t in rows)
+        {
+            if (string.IsNullOrWhiteSpace(currency))
+            {
+                items.Add(new TransactionListItem(t.Id, t.Description, t.TransactionDate, t.Amount, null, null, null));
+                continue;
+            }
+
+            var rate = await rates.GetRateOnOrBeforeAsync(currency, t.TransactionDate, ct);
+            items.Add(rate is null
+                ? new TransactionListItem(t.Id, t.Description, t.TransactionDate, t.Amount, currency, null, null)
+                : new TransactionListItem(t.Id, t.Description, t.TransactionDate, t.Amount, currency,
+                    rate.Rate, CurrencyConverter.Convert(t.Amount, rate.Rate)));
+        }
+
+        return ServiceResult<PagedResult<TransactionListItem>>.Success(
+            new PagedResult<TransactionListItem>(page, pageSize, total, items));
+    }
 }

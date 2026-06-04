@@ -11,7 +11,9 @@ COPY . .
 RUN dotnet publish "src/Wex.CardApi/Wex.CardApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # ---- Runtime stage ----
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+# Chiseled (distroless) runtime: ~half the size, non-root, minimal CVE surface.
+# The base (non -extra) tag is fine because the app sets InvariantGlobalization=true.
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 EXPOSE 8080

@@ -21,4 +21,7 @@ public sealed class FakeExchangeRateProvider : IExchangeRateProvider
         => Task.FromResult<ExchangeRate?>(currency == UnknownCurrency
             ? null
             : new ExchangeRate(currency, LatestRate, DateOnly.FromDateTime(DateTime.UtcNow)));
+
+    public Task<IReadOnlyList<string>> GetAvailableCurrenciesAsync(CancellationToken ct = default)
+        => Task.FromResult<IReadOnlyList<string>>(new[] { "Canada-Dollar", "Euro Zone-Euro" });
 }

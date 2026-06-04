@@ -7,6 +7,31 @@ public static class TransactionEndpoints
 {
     public static IEndpointRouteBuilder MapTransactionEndpoints(this IEndpointRouteBuilder app)
     {
+        // List a card's transactions (paged), optionally converted to a target currency.
+        app.MapGet("/transactions",
+                async (Guid? cardId, int? page, int? pageSize, string? currency,
+                       TransactionService service, CancellationToken ct) =>
+                {
+                    if (cardId is null)
+                        return Results.ValidationProblem(new Dictionary<string, string[]>
+                        {
+                            ["cardId"] = ["The 'cardId' query parameter is required."]
+                        });
+
+                    var result = await service.ListAsync(cardId.Value, page ?? 1, pageSize ?? 10, currency, ct);
+                    return result.Error switch
+                    {
+                        ServiceError.None => Results.Ok(result.Value),
+                        ServiceError.NotFound => Results.NotFound(),
+                        _ => Results.Problem()
+                    };
+                })
+            .WithTags("Transactions")
+            .WithName("ListTransactions")
+            .Produces<PagedResult<TransactionListItem>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
+            .ProducesValidationProblem();
+
         // Requirement #2: Store a purchase transaction against a card.
         app.MapPost("/cards/{cardId:guid}/transactions",
                 async (Guid cardId, CreateTransactionRequest request, TransactionService service, CancellationToken ct) =>

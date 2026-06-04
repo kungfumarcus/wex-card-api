@@ -9,6 +9,12 @@ public static class CardEndpoints
     {
         var group = app.MapGroup("/cards").WithTags("Cards");
 
+        // List all cards (populates the card chooser).
+        group.MapGet("/", async (CardService service, CancellationToken ct) =>
+                Results.Ok(await service.ListAsync(ct)))
+            .WithName("ListCards")
+            .Produces<IReadOnlyList<CardResponse>>(StatusCodes.Status200OK);
+
         // Requirement #1: Create a card with a credit limit.
         group.MapPost("/", async (CreateCardRequest request, CardService service, CancellationToken ct) =>
             {

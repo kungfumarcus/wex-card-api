@@ -3,371 +3,298 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WEX Card API · Console</title>
+  <title>WEX Card</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0f1115;
-      --rail: #0b0d10;
-      --surface: #161922;
-      --surface-2: #1c212c;
-      --border: #2a303c;
-      --text: #e8eaf0;
-      --muted: #8b92a1;
-      --accent: #f2c14e;
-      --accent-ink: #1a1205;
-      --ok: #5fd38a;
-      --err: #ff7a7a;
-      --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-      --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+      --brand: #14463a; --brand-deep: #0f3329; --mint: #7ee0b8;
+      --accent: #1f7a5a; --accent-hover: #1a6b4e;
+      --bg: #f6f4ef; --card: #ffffff; --ink: #1b201d; --muted: #6f756f; --line: #e7e3da;
+      --ok-ink: #1f7a5a; --err-bg: #fdecea; --err-ink: #b3261e;
+      --font: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
+    body { font-family: var(--font); background: var(--bg); color: var(--ink); display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-    /* ---- Sidebar ---- */
-    .rail {
-      width: 256px;
-      flex-shrink: 0;
-      background: var(--rail);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 22px 14px;
-    }
-    .brand { padding: 6px 10px 22px; }
-    .brand h1 {
-      font-size: 15px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      margin: 0;
-      font-weight: 700;
-    }
-    .brand span { color: var(--accent); }
-    .brand p {
-      margin: 4px 0 0;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: .04em;
-    }
-    nav { display: flex; flex-direction: column; gap: 4px; }
-    .nav-btn {
-      text-align: left;
-      background: transparent;
-      border: 0;
-      color: var(--muted);
-      font-family: var(--sans);
-      font-size: 14px;
-      font-weight: 500;
-      padding: 11px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-      border-left: 2px solid transparent;
-      transition: background .14s ease, color .14s ease, border-color .14s ease;
-    }
-    .nav-btn .idx { font-family: var(--mono); font-size: 11px; opacity: .6; }
-    .nav-btn:hover { background: var(--surface); color: var(--text); }
-    .nav-btn.active {
-      background: var(--surface-2);
-      color: var(--text);
-      border-left-color: var(--accent);
-    }
-    .rail-foot {
-      margin-top: auto;
-      padding: 12px 10px 2px;
-      border-top: 1px solid var(--border);
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.9;
-      word-break: break-all;
-    }
-    .rail-foot b { color: var(--text); font-weight: 500; }
+    .rail { width: 264px; flex-shrink: 0; background: var(--brand); color: #e9f3ee; display: flex; flex-direction: column; padding: 26px 16px; }
+    .brand { padding: 6px 12px 26px; }
+    .brand h1 { font-size: 19px; font-weight: 800; margin: 0; letter-spacing: -.01em; }
+    .brand h1 b { color: var(--mint); }
+    .brand p { margin: 3px 0 0; font-size: 12.5px; color: #9cc4b4; }
+    nav { display: flex; flex-direction: column; gap: 3px; }
+    .nav-btn { text-align: left; background: transparent; border: 0; color: #bcd6cb; font-family: var(--font); font-size: 14.5px; font-weight: 500; padding: 12px 14px; border-radius: 10px; cursor: pointer; border-left: 3px solid transparent; transition: background .15s, color .15s, border-color .15s; }
+    .nav-btn:hover { background: var(--brand-deep); color: #fff; }
+    .nav-btn.active { background: var(--brand-deep); color: #fff; border-left-color: var(--mint); font-weight: 600; }
+    .rail-foot { margin-top: auto; padding: 14px 12px 2px; border-top: 1px solid rgba(255,255,255,.12); font-size: 12px; color: #9cc4b4; }
+    .rail-foot .ref { color: #e9f3ee; font-weight: 600; word-break: break-all; margin-top: 2px; }
 
-    /* ---- Main ---- */
-    main { flex: 1; overflow-y: auto; padding: 40px 48px; }
+    main { flex: 1; overflow-y: auto; padding: 56px 56px; }
     .wrap { max-width: 720px; margin: 0 auto; }
     .view { display: none; }
-    .view.visible { display: block; animation: fade .22s ease; }
-    @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .view.visible { display: block; animation: rise .24s ease; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-    .view-head { margin-bottom: 26px; }
-    .route {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-family: var(--mono); font-size: 12px;
-      background: var(--surface); border: 1px solid var(--border);
-      padding: 5px 10px; border-radius: 6px; color: var(--muted);
-    }
-    .route .m { color: var(--accent); font-weight: 600; }
-    .view-head h2 { font-size: 24px; margin: 14px 0 4px; font-weight: 600; }
-    .view-head p { margin: 0; color: var(--muted); font-size: 14px; }
+    h2 { font-size: 27px; font-weight: 700; margin: 0 0 6px; letter-spacing: -.02em; }
+    .lede { margin: 0 0 30px; color: var(--muted); font-size: 15px; line-height: 1.5; }
 
-    .field { margin-bottom: 16px; }
-    label {
-      display: block; font-size: 12px; color: var(--muted);
-      margin-bottom: 6px; letter-spacing: .03em; text-transform: uppercase;
-    }
-    input {
-      width: 100%; background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); font-family: var(--mono); font-size: 14px;
-      padding: 11px 12px; border-radius: 8px; outline: none;
-      transition: border-color .14s ease, box-shadow .14s ease;
-    }
-    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(242,193,78,.14); }
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; }
+    .control { width: 100%; background: var(--card); border: 1px solid var(--line); color: var(--ink); font-family: var(--font); font-size: 15px; padding: 13px 14px; border-radius: 11px; outline: none; transition: border-color .15s, box-shadow .15s; }
+    .control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(31,122,90,.15); }
+    select.control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236f756f' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+    .with-prefix { position: relative; }
+    .with-prefix .prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .with-prefix .control { padding-left: 28px; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
 
-    button.go {
-      margin-top: 6px; background: var(--accent); color: var(--accent-ink);
-      border: 0; font-family: var(--sans); font-weight: 600; font-size: 14px;
-      padding: 11px 20px; border-radius: 8px; cursor: pointer;
-      transition: transform .1s ease, filter .14s ease;
-    }
-    button.go:hover { filter: brightness(1.06); }
+    button.go { margin-top: 8px; background: var(--accent); color: #fff; border: 0; font-family: var(--font); font-weight: 600; font-size: 15px; padding: 13px 26px; border-radius: 11px; cursor: pointer; transition: background .15s, transform .1s; }
+    button.go:hover { background: var(--accent-hover); }
     button.go:active { transform: translateY(1px); }
 
-    .result { margin-top: 26px; }
-    .result-empty {
-      border: 1px dashed var(--border); border-radius: 10px;
-      padding: 20px; color: var(--muted); font-family: var(--mono);
-      font-size: 13px; text-align: center;
-    }
-    .result.flash pre { animation: fade .22s ease; }
-    .status {
-      font-family: var(--mono); font-size: 13px; font-weight: 600;
-      padding: 7px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--border);
-      border-bottom: 0;
-    }
-    .status.ok { color: var(--ok); background: rgba(95,211,138,.08); }
-    .status.err { color: var(--err); background: rgba(255,122,122,.08); }
-    pre {
-      margin: 0; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 0 0 10px 10px; padding: 16px; overflow-x: auto;
-      font-family: var(--mono); font-size: 13px; line-height: 1.55; color: var(--text);
-    }
+    .result { margin-top: 28px; }
+    .result:empty { display: none; }
+    .card-out { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; animation: rise .2s ease; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+    .card-out.ok { border-left: 4px solid var(--accent); }
+    .card-out.err { border-left: 4px solid var(--err-ink); background: var(--err-bg); }
+    .out-title { font-size: 15px; font-weight: 700; margin: 0 0 14px; }
+    .card-out.ok .out-title { color: var(--ok-ink); }
+    .card-out.err .out-title { color: var(--err-ink); }
+    .card-out.err .out-msg { color: #7a1a13; font-size: 14.5px; line-height: 1.5; margin: 0; }
+    .figure { font-size: 30px; font-weight: 700; letter-spacing: -.02em; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .figure .arrow { color: var(--muted); font-weight: 500; font-size: 22px; }
+    .figure .cur { font-size: 17px; font-weight: 600; color: var(--muted); }
+    .fine { color: var(--muted); font-size: 12.5px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .kv { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+    .kv:last-child { border-bottom: 0; }
+    .kv span { color: var(--muted); }
+    .kv b { font-weight: 600; text-align: right; word-break: break-all; }
+
+    table.tx { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-size: 14px; }
+    table.tx th, table.tx td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+    table.tx th { font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 600; background: #faf9f5; }
+    table.tx tr:last-child td { border-bottom: 0; }
+    table.tx .num { text-align: right; white-space: nowrap; }
+    table.tx .empty { text-align: center; color: var(--muted); padding: 26px; }
+    .muted { color: var(--muted); }
+    .pager { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; font-size: 13px; color: var(--muted); }
+    button.pg { background: var(--card); border: 1px solid var(--line); color: var(--ink); font-family: var(--font); font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 9px; cursor: pointer; }
+    button.pg:disabled { color: var(--muted); cursor: default; opacity: .55; }
+    button.pg:not(:disabled):hover { border-color: var(--accent); }
   </style>
 </head>
 <body>
   <aside class="rail">
-    <div class="brand">
-      <h1>WEX <span>·</span> CARD API</h1>
-      <p>console</p>
-    </div>
+    <div class="brand"><h1>WEX<b>Card</b></h1><p>Card &amp; spend console</p></div>
     <nav>
-      <button class="nav-btn active" data-view="create"><span class="idx">01</span> Create card</button>
-      <button class="nav-btn" data-view="transaction"><span class="idx">02</span> Add transaction</button>
-      <button class="nav-btn" data-view="convert"><span class="idx">03</span> Convert transaction</button>
-      <button class="nav-btn" data-view="balance"><span class="idx">04</span> Card balance</button>
+      <button class="nav-btn active" data-view="create">Open a card</button>
+      <button class="nav-btn" data-view="transaction">Record a purchase</button>
+      <button class="nav-btn" data-view="transactions">Transactions</button>
+      <button class="nav-btn" data-view="balance">Check balance</button>
     </nav>
-    <div class="rail-foot">
-      card&nbsp;&nbsp;<b id="sess-card">—</b><br />
-      txn&nbsp;&nbsp;&nbsp;<b id="sess-txn">—</b>
-    </div>
+    <div class="rail-foot">Active card<div class="ref" id="sess-card">None yet</div></div>
   </aside>
 
   <main>
     <div class="wrap">
 
-      <!-- 01 Create card -->
+      <!-- Open a card -->
       <section class="view visible" id="view-create">
-        <div class="view-head">
-          <span class="route"><span class="m">POST</span> /cards</span>
-          <h2>Create card</h2>
-          <p>Store a card with a credit limit (USD). Returns a generated id.</p>
-        </div>
+        <h2>Open a new card</h2>
+        <p class="lede">Choose a credit limit to issue a card.</p>
         <div class="field">
           <label for="card-limit">Credit limit</label>
-          <input id="card-limit" type="number" step="0.01" value="1000" />
+          <div class="with-prefix"><span class="prefix">$</span><input id="card-limit" class="control" type="number" step="0.01" value="1000" /></div>
         </div>
-        <button class="go" onclick="createCard()">Create card</button>
-        <div class="result result-empty" id="res-create">No response yet.</div>
+        <button class="go" onclick="createCard()">Open card</button>
+        <div class="result" id="res-create"></div>
       </section>
 
-      <!-- 02 Add transaction -->
+      <!-- Record a purchase -->
       <section class="view" id="view-transaction">
-        <div class="view-head">
-          <span class="route"><span class="m">POST</span> /cards/{cardId}/transactions</span>
-          <h2>Add transaction</h2>
-          <p>Store a purchase transaction (amount in USD) against a card.</p>
-        </div>
-        <div class="field">
-          <label for="txn-cardId">Card id</label>
-          <input id="txn-cardId" type="text" placeholder="GUID from Create card" />
-        </div>
-        <div class="field">
-          <label for="txn-desc">Description</label>
-          <input id="txn-desc" type="text" value="Coffee" />
-        </div>
+        <h2>Record a purchase</h2>
+        <p class="lede">Log a purchase (in USD) against a card.</p>
+        <div class="field"><label for="txn-cardId">Card</label><select id="txn-cardId" class="control card-select"></select></div>
+        <div class="field"><label for="txn-desc">What was it for?</label><input id="txn-desc" class="control" type="text" value="Coffee" /></div>
         <div class="row">
-          <div class="field">
-            <label for="txn-date">Transaction date</label>
-            <input id="txn-date" type="date" />
-          </div>
-          <div class="field">
-            <label for="txn-amount">Amount</label>
-            <input id="txn-amount" type="number" step="0.01" value="12.50" />
-          </div>
+          <div class="field"><label for="txn-date">Date</label><input id="txn-date" class="control" type="date" /></div>
+          <div class="field"><label for="txn-amount">Amount</label><div class="with-prefix"><span class="prefix">$</span><input id="txn-amount" class="control" type="number" step="0.01" value="12.50" /></div></div>
         </div>
-        <button class="go" onclick="addTxn()">Add transaction</button>
-        <div class="result result-empty" id="res-txn">No response yet.</div>
+        <button class="go" onclick="addTxn()">Record purchase</button>
+        <div class="result" id="res-txn"></div>
       </section>
 
-      <!-- 03 Convert transaction -->
-      <section class="view" id="view-convert">
-        <div class="view-head">
-          <span class="route"><span class="m">GET</span> /transactions/{id}?currency=</span>
-          <h2>Convert transaction</h2>
-          <p>Retrieve a transaction converted using the rate on/before its date (within 6 months).</p>
+      <!-- Transactions -->
+      <section class="view" id="view-transactions">
+        <h2>Transactions</h2>
+        <p class="lede">Browse a card's purchases. Switch the display currency to see each purchase converted at the rate from its own date.</p>
+        <div class="toolbar">
+          <div><label for="tx-cardId">Card</label><select id="tx-cardId" class="control card-select" onchange="loadTransactions(true)"></select></div>
+          <div><label for="tx-currency">Show amounts in</label><select id="tx-currency" class="control" onchange="loadTransactions(true)"></select></div>
         </div>
-        <div class="field">
-          <label for="conv-txnId">Transaction id</label>
-          <input id="conv-txnId" type="text" placeholder="GUID from Add transaction" />
-        </div>
-        <div class="field">
-          <label for="conv-currency">Currency (Treasury country_currency_desc)</label>
-          <input id="conv-currency" type="text" list="currencies" value="Canada-Dollar" />
-        </div>
-        <button class="go" onclick="convert()">Convert</button>
-        <div class="result result-empty" id="res-conv">No response yet.</div>
+        <div id="tx-list"></div>
       </section>
 
-      <!-- 04 Card balance -->
+      <!-- Check balance -->
       <section class="view" id="view-balance">
-        <div class="view-head">
-          <span class="route"><span class="m">GET</span> /cards/{cardId}/balance?currency=</span>
-          <h2>Card balance</h2>
-          <p>Available balance (limit − transactions) converted at the latest rate.</p>
-        </div>
-        <div class="field">
-          <label for="bal-cardId">Card id</label>
-          <input id="bal-cardId" type="text" placeholder="GUID from Create card" />
-        </div>
-        <div class="field">
-          <label for="bal-currency">Currency (Treasury country_currency_desc)</label>
-          <input id="bal-currency" type="text" list="currencies" value="Canada-Dollar" />
-        </div>
-        <button class="go" onclick="balance()">Get balance</button>
-        <div class="result result-empty" id="res-bal">No response yet.</div>
+        <h2>Check balance</h2>
+        <p class="lede">See a card's available balance in your choice of currency, at the latest rate.</p>
+        <div class="field"><label for="bal-cardId">Card</label><select id="bal-cardId" class="control card-select"></select></div>
+        <div class="field"><label for="bal-currency">Show in</label><select id="bal-currency" class="control"></select></div>
+        <button class="go" onclick="balance()">Check balance</button>
+        <div class="result" id="res-bal"></div>
       </section>
 
     </div>
   </main>
 
-  <datalist id="currencies">
-    <option value="Canada-Dollar"></option>
-    <option value="Euro Zone-Euro"></option>
-    <option value="United Kingdom-Pound"></option>
-    <option value="Japan-Yen"></option>
-    <option value="Australia-Dollar"></option>
-    <option value="Mexico-Peso"></option>
-    <option value="Switzerland-Franc"></option>
-    <option value="India-Rupee"></option>
-  </datalist>
-
   <script>
-    const state = { cardId: null, txnId: null };
+    const state = { cardId: null };
     const byId = (id) => document.getElementById(id);
+    const opt = (value, text) => { const o = document.createElement("option"); o.value = value; o.textContent = text; return o; };
+    const escapeHtml = (s) => (s ?? "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    const usd = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+    const amount2 = (n) => new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+    const niceCurrency = (desc) => (desc || "").replace(/-/g, " ");
 
-    // ---- Navigation ----
-    document.querySelectorAll(".nav-btn").forEach((btn) => {
-      btn.addEventListener("click", () => selectView(btn.dataset.view));
-    });
-
-    function selectView(view) {
-      document.querySelectorAll(".nav-btn").forEach((b) =>
-        b.classList.toggle("active", b.dataset.view === view));
-      document.querySelectorAll(".view").forEach((v) =>
-        v.classList.toggle("visible", v.id === "view-" + view));
-
-      // Convenience: carry the last created ids into the relevant forms.
-      if (view === "transaction" && state.cardId && !byId("txn-cardId").value) byId("txn-cardId").value = state.cardId;
-      if (view === "balance" && state.cardId && !byId("bal-cardId").value) byId("bal-cardId").value = state.cardId;
-      if (view === "convert" && state.txnId && !byId("conv-txnId").value) byId("conv-txnId").value = state.txnId;
-    }
-
-    function updateSession() {
-      byId("sess-card").textContent = state.cardId ?? "—";
-      byId("sess-txn").textContent = state.txnId ?? "—";
-    }
-
-    // ---- HTTP helper ----
     async function call(method, url, bodyObj) {
       const opts = { method, headers: {} };
-      if (bodyObj !== undefined) {
-        opts.headers["Content-Type"] = "application/json";
-        opts.body = JSON.stringify(bodyObj);
-      }
+      if (bodyObj !== undefined) { opts.headers["Content-Type"] = "application/json"; opts.body = JSON.stringify(bodyObj); }
       const res = await fetch(url, opts);
       const text = await res.text();
-      let body;
-      try { body = text ? JSON.parse(text) : ""; } catch { body = text; }
+      let body; try { body = text ? JSON.parse(text) : null; } catch { body = null; }
       return { res, body };
     }
-
-    function escapeHtml(s) {
-      return s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    function showOk(host, html) { byId(host).innerHTML = `<div class="card-out ok">${html}</div>`; }
+    function showErr(host, title, message) { byId(host).innerHTML = `<div class="card-out err"><p class="out-title">${title}</p><p class="out-msg">${message}</p></div>`; }
+    function friendlyError(res, body, notFound) {
+      if (res.status === 400 && body && body.errors) return Object.values(body.errors).flat().join(" ");
+      if (res.status === 404) return notFound;
+      if (res.status === 422) return (body && body.detail) || "We can't show that currency right now.";
+      return (body && (body.detail || body.title)) || "Something went wrong. Please try again.";
     }
 
-    function showResult(host, res, body) {
-      const el = byId(host);
-      const cls = res.ok ? "ok" : "err";
-      const label = res.statusText || (res.ok ? "OK" : "Error");
-      const pretty = typeof body === "string" ? body : JSON.stringify(body, null, 2);
-      el.classList.remove("result-empty");
-      el.innerHTML =
-        `<div class="status ${cls}">${res.status} ${label}</div>` +
-        `<pre>${escapeHtml(pretty || "(empty body)")}</pre>`;
-      el.classList.add("flash");
-      setTimeout(() => el.classList.remove("flash"), 250);
+    // ---- Choosers ----
+    async function loadCards(selectId) {
+      let cards = [];
+      try { const res = await fetch("/cards"); cards = res.ok ? await res.json() : []; } catch {}
+      for (const sel of document.querySelectorAll(".card-select")) {
+        const prev = sel.value;
+        sel.innerHTML = "";
+        if (!cards.length) { sel.appendChild(opt("", "No cards yet — open one first")); continue; }
+        for (const c of cards) sel.appendChild(opt(c.id, c.id));
+        const want = selectId || prev || state.cardId;
+        if (want && [...sel.options].some(o => o.value === want)) sel.value = want;
+      }
+    }
+    async function loadCurrencies() {
+      let list = [];
+      try { const res = await fetch("/currencies"); list = res.ok ? await res.json() : []; } catch {}
+      const bal = byId("bal-currency"); bal.innerHTML = "";
+      if (!list.length) bal.appendChild(opt("", "Currencies unavailable"));
+      else { for (const d of list) bal.appendChild(opt(d, niceCurrency(d))); const cad = [...bal.options].find(o => o.value === "Canada-Dollar"); if (cad) bal.value = "Canada-Dollar"; }
+      const tx = byId("tx-currency"); tx.innerHTML = "";
+      tx.appendChild(opt("", "USD (original)"));
+      for (const d of list) tx.appendChild(opt(d, niceCurrency(d)));
+    }
+
+    // ---- Navigation ----
+    document.querySelectorAll(".nav-btn").forEach((btn) => btn.addEventListener("click", () => selectView(btn.dataset.view)));
+    function selectView(view) {
+      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.view === view));
+      document.querySelectorAll(".view").forEach((v) => v.classList.toggle("visible", v.id === "view-" + view));
+      if (view === "transactions") loadTransactions(true);
     }
 
     // ---- Operations ----
     async function createCard() {
       const { res, body } = await call("POST", "/cards", { creditLimit: Number(byId("card-limit").value) });
-      if (res.ok && body && body.id) { state.cardId = body.id; updateSession(); }
-      showResult("res-create", res, body);
+      if (res.ok && body) {
+        state.cardId = body.id;
+        byId("sess-card").textContent = body.id;
+        await loadCards(body.id);
+        showOk("res-create", `<p class="out-title">Your card is ready</p>
+          <div class="kv"><span>Card reference</span><b>${body.id}</b></div>
+          <div class="kv"><span>Credit limit</span><b>${usd(body.creditLimit)}</b></div>`);
+      } else { showErr("res-create", "We couldn't open the card", friendlyError(res, body, "")); }
     }
 
     async function addTxn() {
-      const cardId = byId("txn-cardId").value.trim();
-      const payload = {
-        description: byId("txn-desc").value,
-        transactionDate: byId("txn-date").value,
-        amount: Number(byId("txn-amount").value),
-      };
+      const cardId = byId("txn-cardId").value;
+      if (!cardId) { showErr("res-txn", "No card selected", "Open a card first."); return; }
+      const payload = { description: byId("txn-desc").value, transactionDate: byId("txn-date").value, amount: Number(byId("txn-amount").value) };
       const { res, body } = await call("POST", `/cards/${encodeURIComponent(cardId)}/transactions`, payload);
-      if (res.ok && body && body.id) { state.txnId = body.id; updateSession(); }
-      showResult("res-txn", res, body);
-    }
-
-    async function convert() {
-      const id = byId("conv-txnId").value.trim();
-      const cur = byId("conv-currency").value.trim();
-      const { res, body } = await call("GET", `/transactions/${encodeURIComponent(id)}?currency=${encodeURIComponent(cur)}`);
-      showResult("res-conv", res, body);
+      if (res.ok && body) {
+        showOk("res-txn", `<p class="out-title">Purchase recorded</p>
+          <div class="kv"><span>${escapeHtml(body.description)}</span><b>${usd(body.amount)}</b></div>
+          <div class="kv"><span>Date</span><b>${body.transactionDate}</b></div>
+          <div class="kv"><span>Purchase reference</span><b>${body.id}</b></div>`);
+      } else { showErr("res-txn", "We couldn't record that purchase", friendlyError(res, body, "We couldn't find that card.")); }
     }
 
     async function balance() {
-      const id = byId("bal-cardId").value.trim();
-      const cur = byId("bal-currency").value.trim();
-      const { res, body } = await call("GET", `/cards/${encodeURIComponent(id)}/balance?currency=${encodeURIComponent(cur)}`);
-      showResult("res-bal", res, body);
+      const cardId = byId("bal-cardId").value;
+      const sel = byId("bal-currency");
+      if (!cardId) { showErr("res-bal", "No card selected", "Open a card first."); return; }
+      const { res, body } = await call("GET", `/cards/${encodeURIComponent(cardId)}/balance?currency=${encodeURIComponent(sel.value)}`);
+      if (res.ok && body) {
+        showOk("res-bal", `<p class="out-title">Available to spend</p>
+          <div class="figure">${usd(body.availableBalanceUsd)}<span class="arrow">&asymp;</span>${amount2(body.convertedAvailableBalance)} <span class="cur">${niceCurrency(body.targetCurrency)}</span></div>
+          <div class="fine">Converted at the latest exchange rate (${body.exchangeRate} for ${body.targetCurrency}).</div>`);
+      } else { showErr("res-bal", "We couldn't fetch your balance", friendlyError(res, body, "We couldn't find that card.")); }
     }
 
-    // Default the date picker to today.
+    // ---- Transactions list ----
+    let txPage = 1;
+    function prevPage() { if (txPage > 1) { txPage--; loadTransactions(false); } }
+    function nextPage() { txPage++; loadTransactions(false); }
+    async function loadTransactions(reset) {
+      if (reset) txPage = 1;
+      const cardId = byId("tx-cardId").value;
+      const currency = byId("tx-currency").value; // "" = USD original
+      const host = byId("tx-list");
+      if (!cardId) { host.innerHTML = `<table class="tx"><tbody><tr><td class="empty">Open a card first.</td></tr></tbody></table>`; return; }
+      const url = `/transactions?cardId=${encodeURIComponent(cardId)}&page=${txPage}&pageSize=10` + (currency ? `&currency=${encodeURIComponent(currency)}` : "");
+      let data;
+      try { const res = await fetch(url); if (!res.ok) throw new Error(); data = await res.json(); }
+      catch { host.innerHTML = `<table class="tx"><tbody><tr><td class="empty">Couldn't load transactions.</td></tr></tbody></table>`; return; }
+      renderTx(data, currency);
+    }
+    function renderTx(data, currency) {
+      const curName = currency ? niceCurrency(currency) : "";
+      let rows = "";
+      if (!data.items.length) {
+        rows = `<tr><td colspan="5" class="empty">No transactions for this card yet.</td></tr>`;
+      } else {
+        for (const t of data.items) {
+          let conv = "—", rate = "—";
+          if (currency) {
+            if (t.convertedAmount != null) { conv = amount2(t.convertedAmount); rate = String(t.exchangeRate); }
+            else { conv = `<span class="muted">unavailable</span>`; }
+          }
+          rows += `<tr><td>${t.transactionDate}</td><td>${escapeHtml(t.description)}</td>
+            <td class="num">${usd(t.amount)}</td><td class="num">${conv}</td><td class="num">${rate}</td></tr>`;
+        }
+      }
+      const totalPages = Math.max(1, Math.ceil(data.total / data.pageSize));
+      byId("tx-list").innerHTML =
+        `<table class="tx"><thead><tr>
+           <th>Date</th><th>Description</th><th class="num">Amount (USD)</th>
+           <th class="num">Converted${curName ? ` (${curName})` : ""}</th><th class="num">Rate</th>
+         </tr></thead><tbody>${rows}</tbody></table>
+         <div class="pager">
+           <button class="pg" ${data.page <= 1 ? "disabled" : ""} onclick="prevPage()">Prev</button>
+           <span>Page ${data.page} of ${totalPages} · ${data.total} total</span>
+           <button class="pg" ${data.page >= totalPages ? "disabled" : ""} onclick="nextPage()">Next</button>
+         </div>`;
+    }
+
     byId("txn-date").value = new Date().toISOString().slice(0, 10);
+    loadCards();
+    loadCurrencies();
   </script>
 </body>
 </html>

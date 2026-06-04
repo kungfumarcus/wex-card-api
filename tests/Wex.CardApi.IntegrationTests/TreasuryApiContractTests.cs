@@ -14,6 +14,8 @@ namespace Wex.CardApi.IntegrationTests;
 /// </summary>
 public class TreasuryApiContractTests
 {
+    private static CancellationToken TestCancellationToken => TestContext.Current.CancellationToken;
+
     private static TreasuryExchangeRateProvider CreateProvider()
     {
         var http = new HttpClient
@@ -28,7 +30,7 @@ public class TreasuryApiContractTests
     {
         var provider = CreateProvider();
 
-        var rate = await provider.GetLatestRateAsync("Canada-Dollar", Xunit.TestContext.Current.CancellationToken);
+        var rate = await provider.GetLatestRateAsync("Canada-Dollar", TestCancellationToken);
 
         Assert.NotNull(rate);
         Assert.Equal("Canada-Dollar", rate!.Currency);
@@ -42,7 +44,7 @@ public class TreasuryApiContractTests
         var provider = CreateProvider();
         var asOf = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        var rate = await provider.GetRateOnOrBeforeAsync("Canada-Dollar", asOf, Xunit.TestContext.Current.CancellationToken);
+        var rate = await provider.GetRateOnOrBeforeAsync("Canada-Dollar", asOf, TestCancellationToken);
 
         Assert.NotNull(rate);
         Assert.True(rate!.RecordDate <= asOf, "Rate must be dated on or before the requested date.");
@@ -55,8 +57,19 @@ public class TreasuryApiContractTests
     {
         var provider = CreateProvider();
 
-        var rate = await provider.GetLatestRateAsync("Atlantis-Doubloon", Xunit.TestContext.Current.CancellationToken);
+        var rate = await provider.GetLatestRateAsync("Atlantis-Doubloon", TestCancellationToken);
 
         Assert.Null(rate);
+    }
+
+    [Fact(Explicit = true)]
+    public async Task Available_currencies_includes_a_known_currency()
+    {
+        var provider = CreateProvider();
+
+        var list = await provider.GetAvailableCurrenciesAsync(TestCancellationToken);
+
+        Assert.NotEmpty(list);
+        Assert.Contains("Canada-Dollar", list);
     }
 }
